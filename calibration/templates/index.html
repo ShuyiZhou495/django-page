@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <form action='{% url 'add_config' %}' method='GET'>
+            <button class="btn btn-outline-secondary " type="submit">add configuration</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

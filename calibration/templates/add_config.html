@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <div class="row">
+                <div class="col mb-4">{% include 'select_path.html' with button_name='import json'%}</div>
+            </div>
+        </div>
+        {% if msgs %}
+            <div class="card mb-2" id="id_msgs">
+            <div class="card-header bg-info text-white">
+                The followings are not found in the json file, fill in by your hands.
+                <button type="button" class="close" onclick="$('#id_msgs').hide()" aria-label="Close">
+                    <span  class="text-white" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+                    <ul class="list-group list-group-flush bg-transparent text-info">
+                        {% for msg in msgs %}
+                            <li class="list-group-item">{{ msg }}
+                        {% endfor %}
+                    </ul>
+            </div>
+        {% endif %}
+
+        <form id="id_config" method="post">
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-header btn" id="camSetting" data-toggle="collapse"
+                     data-target="#collapseCamSetting" aria-expanded="true">
+                    <h3 class="mb-0 text-sm-left">
+                        Camera Setting
+                        <i class="fa fa-chevron-down"></i>
+                    </h3>
+                </div>
+                <div id="collapseCamSetting" class="collapse show" >
+                    <div class="card-body">
+                            {% include "config_form/camera_setting.html" with camera=camera %}
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header btn" id="lidarSetting" data-toggle="collapse"
+                     data-target="#collapseLiDARSetting" aria-expanded="true">
+                        <h3 class="mb-0 text-sm-left">
+                            LiDAR Setting
+                            <i class="fa fa-chevron-down"></i>
+                        </h3>
+                </div>
+                <div id="collapseLiDARSetting" class="collapse show" >
+                    <div class="card-body">
+                        {% include 'config_form/lidar_setting.html' with lidar=lidar%}
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header btn" id="lidarSetting" data-toggle="collapse"
+                     data-target="#collapseMethodSetting" aria-expanded="true">
+                    <h3 class="mb-0 text-sm-left">
+                        Calibration Method Setting
+                        <i class="fa fa-chevron-down"></i>
+                    </h3>
+                </div>
+                <div id="collapseMethodSetting" class="collapse show" >
+                    <div class="card-body">
+                        {% include 'config_form/method_setting.html' with config=config selected_frames=selected_frames%}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-info mt-4 mb-4">Submit</button>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    {% load static %}
+    <script type="text/javascript" src="{% static "js/buttons.js" %}"></script>
+{% endblock %}

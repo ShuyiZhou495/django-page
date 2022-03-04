@@ -1,0 +1,282 @@
+<div class="form-group row">
+    <label for="id_name" class="col-sm-4">
+        Name for this configuration
+    </label>
+    <input type="text" name="name" id="id_name" class="col-sm-7 form-control">
+</div>
+<h4 class="row col">
+   Frames
+</h4>
+<hr>
+{#image path#}
+<div class="row">
+    <div class="col input-group mb-3">
+        <div class="input-group-prepend">
+            <div class="input-group-prepend">
+                <label for="id_img_path" class="input-group-text">Image frame Path</label>
+            </div>
+        </div>
+        <input type="text" class="form-control" id="id_img_path" name="img_path" required
+               placeholder="/path/to/img/img_prefix" value="{{ config.img_path|default_if_none:'' }}">
+        <div class="input-group-append">
+            <span class="input-group-text">0001</span>
+            <span class="input-group-text input-group-prepend">.</span>
+            <div class="input-group-prepend">
+                <input type="text" class="form-control" name="img_type"
+                       aria-label="type of image files" placeholder="png"
+                       value="{{ config.img_type|default_if_none:'' }}" required>
+            </div>
+        </div>
+    </div>
+</div>
+{#scan path#}
+<div class="row">
+    <div class="col input-group mb-3">
+        <div class="input-group-prepend">
+            <div class="input-group-prepend">
+                <label for="id_scan_path" class="input-group-text">Scan frame Path</label>
+            </div>
+        </div>
+        <input type="text" class="form-control" id="id_scan_path" name="scan_path" required
+               placeholder="/path/to/scan/scan_prefix" value="{{ config.scan_path|default_if_none:'' }}">
+        <div class="input-group-append">
+            <span class="input-group-text">0001</span>
+            <span class="input-group-text input-group-prepend">.txt</span>
+        </div>
+    </div>
+</div>
+{#scan files setting#}
+<div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="id_rxyz" name="rxyz"
+            {% if config.show_distribution %} checked {% endif %}>
+    <label class="form-check-label" for="id_rxyz">
+        whether a line of scan point is like 'r, x, y, z' (check), or 'x, y, z, r' (don't check)
+    </label>
+</div>
+<div class="form-row">
+    <div class="col form-group">
+        <label for="id_delimiter"> Delimiter of scan txt </label>
+        <input type="text" class="form-control" id="id_delimiter" name="delimiter" required
+               value="{{ config.delimiter|default_if_none:False }}">
+        <small class="form-text text-muted">
+            eg. if the file is like 'x, y, z, r', then delimiter is ,
+        </small>
+    </div>
+    <div class="col form-group">
+        <label for="id_skip_line"> How many lines to skip in scan txt</label>
+        <input type="number" class="form-control" id="id_skip_line"
+               name="skip_line" value="{% if config.skip_line %}{{ config.skip_line}}{% endif %}">
+        <small class="form-text text-muted">
+            eg. if first line is title or count of lines, skip line is 1
+        </small>
+    </div>
+</div>
+{#select frame#}
+<div class="input-group">
+    <div class="input-group-prepend">
+        <div class="input-group-text">
+            <input type="checkbox" id="id_select_frame_by_hand" name="select_frame_by_hand"
+{#                    {% if config.select_frame_by_hand %} checked {% endif %}#}
+                   onclick='alt_by_class(this.checked, "manual_select", "random_select")'>
+        </div>
+        <label class="input-group-text" for="id_select_frame_by_hand">
+            select frames manually</label>
+    </div>
+    <input type="number" class="form-control random_select" id="id_start_frame" name="start_frame"
+               value="{{ config.start_frame|default_if_none:'' }}" placeholder="start frame"
+               aria-label="start frame">
+    <input type="number" class="form-control random_select" id="id_end_frame" name="end_frame"
+               placeholder="end frame" aria-label="end frame"
+               value="{{ config.end_frame|default_if_none:'' }}">
+    <input type="number" class="form-control random_select" id="id_use_frame" name="use_frame"
+               placeholder="use frame" aria-label="use frame"
+               value="{{ config.use_frame|default_if_none:'' }}">
+    <input type="text" class="form-control manual_select" id="id_selected" aria-label="selected frames"
+           name="selected" value="{{ config.selected|default_if_none:'' }}"
+    placeholder="separate by comma, eg. 2, 4, 5, 62, 100">
+</div>
+<small class="form-text text-muted random_select mb3">
+    Randomly select frames frame start frame to end frame
+</small>
+
+<h4 class="row col mt-3">
+    Methods
+</h4>
+<hr>
+<div class="row">
+<div class="form-group col-6">
+    <label for="id_ini_type">Rotation Type</label>
+    <select id="id_ini_type" class="form-control" name="ini_type" onchange="show_angles(this.value)">
+        <option>Choose...</option>
+        <option value="euler"> Euler Angle (x y z) </option>
+        <option value="quaternion"> quaternion </option>
+    </select>
+</div>
+
+    <div class="col-4 euler">
+        <small class="row form-text text-muted">check if angles are in degrees; not check if in radians</small>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="id_degree" {% if config.degree %}checked{% endif %}>
+        <label class="form-check-label" for="id_degree">In degree</label>
+    </div>
+
+    </div>
+    </div>
+
+<h4 class="row col mt-3">
+    Methods
+</h4>
+<hr>
+{#mi method#}
+<div class="row">
+    <div class="col-sm-4 input-group">
+        <div class="input-group-prepend">
+            <div class="input-group-text">
+                <input type="checkbox" id="id_mi_use" name="mi_use"
+                        {% if config.mi_use %} checked {% endif %}
+                       onclick="show_by_id(this.checked, 'mi_setting');add_option('mi', this.checked)">
+            </div>
+        </div>
+        <div class="input-group-append">
+            <label for="id_mi_use" class="input-group-text bg-white">Use MI</label>
+        </div>
+    </div>
+    <div id="mi_setting" class="form-group">
+
+    <div class="col-sm-8 input-group">
+
+        <div class="input-group-prepend">
+            <label for="id_show_distribution" class="input-group-text bg-white">Show distributions</label>
+        </div>
+        <div class="input-group-append">
+            <div class="input-group-text bg-white">
+                <input type="checkbox" id="id_show_distribution"
+                       name="show_distribution" value={% if config.show_distribution %} checked {% endif %}>
+            </div>
+        </div>
+    </div>
+        <small class="col form-text text-muted">
+            plots of distribution of camera intensity/ lidar reflectivity will be displayed
+        </small>
+    </div>
+</div>
+{#edge method#}
+<div class="row">
+    <div class="col-sm-4 input-group mt-2">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <input type="checkbox" id="id_edge_use" name="edge_use"
+                           {% if config.edge_use %} checked {% endif %}
+                           onclick="show_by_id(this.checked, 'edge_setting');add_option('edge', this.checked)">
+                </div>
+            </div>
+            <div class="input-group-append bg-white">
+                <label for="id_edge_use" class="input-group-text bg-white">Use Edge</label>
+            </div>
+        </div>
+
+    </div>
+    <div id="edge_setting" class="col-sm-8 input-group mb-3">
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <label for="id_check_laser" class="input-group-text bg-white">Check Laser Beam</label>
+                    </div>
+                    <div class="input-group-append">
+                        <div class=" input-group-text bg-white">
+                            <input type="checkbox" id="id_check_laser"
+                                   name="check_laser"
+                                    {% if config.check_laser %} checked {% endif %}>
+                        </div>
+                    </div>
+                </div>
+                <small class="col form-text text-muted  mb-2">
+                    plots of distribution of camera intensity/ lidar reflectivity will be displayed
+                </small>
+            </div>
+
+            <div class="col">
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <label for="id_discontinuity" class="input-group-text bg-white">discontinuity Threshold</label>
+                </div>
+                <input type="number" id="id_discontinuity" class="form-control"
+                       name="discontinuity" value="{{ config.discontinuity|default_if_none:''}}">
+            </div>
+            <small class="col form-text text-muted  mb-2">
+                jump discontinuity to calculate LiDAR point edge. Normally 0.5.
+            </small>
+            </div>
+        </div>
+            <div class="row">
+            <div class="col-12 input-group mb-2">
+                <div class="input-group-prepend">
+                    <label for="id_edge_path" class="input-group-text bg-white">Edge path</label>
+                </div>
+                <input type="text" id="id_edge_path" class="form-control"  name="edge_path" size="80"
+                           value="{{ config.edge_path|default_if_none:''}}"
+                       placeholder="A folder to save the image of image edges"
+                >
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="row col mt-3">
+    Visualization setting
+</h4>
+<hr>
+
+<div class="form-group row">
+    <label for="id_vis" class="col-sm-4">Select visualization method</label>
+    <select id="id_vis" class="form-control col-sm-7" name="vis" required>
+        <option selected> ------- </option>
+        <option hidden disabled>{{ config.vis }}</option>
+    </select>
+</div>
+
+<h4 class="row col mt-3">
+    Running setting
+</h4>
+<hr>
+<div class="row">
+    <div class="col input-group mt-2">
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="id_test" name="test"
+                    {% if config.test_amount > 0 %} checked {% endif %}
+                   onclick="show_by_id(this.checked, 'if_test')">
+            <label class="form-check-label" for="id_test">
+                whether calibration only with initial guess (don't check), or with initial value randomly away from initial guess (check)
+            </label>
+        </div>
+    </div>
+    <div class="col-sm-7 input-group mb-3"  id="if_test">
+        <div class="input-group col-11 mb-2">
+            <div class="input-group-prepend">
+                <label for="id_test_amount" class="input-group-text bg-white">Amount of tests</label>
+            </div>
+            <input type="number" id="id_test_amount" class="form-control"
+                   name="test_amount"
+                   value="{% if config.test_amount > 0 %}{{ config.test_amount }}{% endif %}">
+        </div>
+
+        <div class="input-group col-11 mb-2">
+            <div class="input-group-prepend">
+                <label for="id_R_range" class="input-group-text bg-white">Deviation of rotation from initial guess</label>
+            </div>
+            <input type="number" id="id_R_range" class="form-control"
+                   name="R_range" value="{{ config.R_range }}">
+        </div>
+        <div class="input-group col-11 mb-2">
+            <div class="input-group-prepend">
+                <label for="id_t_range" class="input-group-text bg-white">Deviation of translation from initial guess</label>
+            </div>
+            <input type="number" id="id_t_range" class="form-control"
+                   name="t_range" value="{{ config.t_range }}">
+        </div>
+    </div>
+</div>

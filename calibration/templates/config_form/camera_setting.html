@@ -1,0 +1,54 @@
+<div class="row">
+    <div class="col">
+        <label for="id_cname"> Name for the camera </label>
+        <input type="text" class="form-control" id="id_cname" placeholder="name" name="cname"
+               value="{{ camera.cname|default_if_none:"" }}" required>
+    </div>
+<div class="col">
+<div class="form-group">
+    <label for="id_cam_type">Type of camera</label>
+    <select class="form-control" id="id_cam_type" name="ctype" onload="show_para(this.value)" onchange="show_para(this.value)"
+            required>
+        <option value="" {% if camera.ctype == '' %}selected {% endif %}>---------</option>
+        <option value="omni" {% if camera.ctype == 'omni' %}selected {% endif %}>Omnidirectional</option>
+        <option value="perspective" {% if camera.ctype == 'perspective' %} selected {% endif %}>Perspective</option>
+        <option value="pinhole"{% if camera.ctype == 'pinhole' %} selected {% endif %}>Pinhole</option>
+        <option value="fisheye"{% if camera.ctype == 'fisheye' %} selected {% endif %}>Fisheye</option>
+    </select>
+</div>
+</div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <label for="id_height"> Height of image</label>
+        <input type="text" class="form-control" id="id_height" placeholder="height" name="height"
+               value="{{ camera.height|default_if_none:"" }}" required>
+    </div>
+    <div class="col">
+        <label for="id_width"> Width of image</label>
+        <input type="text" class="form-control" id="id_height"  placeholder="width" name="width"
+               value="{{ camera.width|default_if_none:"" }}" required>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="id_mask" class="col-sm-2 col-form-label">Mask Path</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" id="id_mask" name="mask"
+               placeholder="if you don't need mask, fill in nothing here"
+               value="{{ camera.mask|default_if_none:"" }}">
+    </div>
+</div>
+
+<div id="cam_para">
+    {% include 'config_form/cams/perspective.html' with camera=camera%}
+
+    {% include 'config_form/cams/omni.html' with camera=camera%}
+
+    {% include 'config_form/cams/pinhole.html' with camera=camera%}
+
+    {% include 'config_form/cams/fisheye.html' with camera=camera%}
+
+</div>
+

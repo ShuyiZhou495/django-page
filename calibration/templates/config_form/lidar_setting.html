@@ -1,0 +1,12 @@
+<div class="row">
+    <div class="col">
+        <label for="id_lname"> Name for the LiDAR </label>
+        <input type="text" class="form-control" id="id_lname" placeholder="name" name="lname"
+               value="{{ lidar.lname |default_if_none:"" }}" required>
+    </div>
+    <div class="col">
+            <label for="id_laser_num"> Number of laser beams </label>
+            <input type="number" class="form-control" id="id_laser_num" name="laser_num"
+                   value="{% if lidar.laser_num %}{{ lidar.laser_num}}{% endif %}">
+    </div>
+</div>
