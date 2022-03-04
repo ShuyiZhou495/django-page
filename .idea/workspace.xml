@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="602b62f4-ec75-49b7-9c54-6de8495986e0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitgnore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/calibration/static/js/buttons.js" beforeDir="false" afterPath="$PROJECT_DIR$/calibration/static/js/buttons.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/calibration/templates/config_form/method_setting.html" beforeDir="false" afterPath="$PROJECT_DIR$/calibration/templates/config_form/method_setting.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/calibration/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/calibration/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +125,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645719779870</updated>
-      <workItem from="1645719783742" duration="77665000" />
+      <workItem from="1645719783742" duration="83143000" />
     </task>
     <servers />
   </component>

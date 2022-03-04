@@ -25,6 +25,10 @@ window.onload = (event) =>{
     let mi_use = $("#id_mi_use")[0].checked;
     show_by_id(edge_use, 'edge_setting');
     show_by_id(mi_use, 'mi_setting');
+
+    let ini_type = $('#id_ini_type')[0];
+    show_angles(ini_type.options[ini_type.selectedIndex].value);
+
     add_option('mi', mi_use);
     add_option('edge', edge_use);
     let vis_selection = $('#id_vis')[0].options[1].innerHTML;
@@ -94,5 +98,24 @@ function add_option(method, value){
     }
 }
 function show_angles(value){
-    console.log(value);
+    let euler = $('.euler');
+    let quat = $('.quat');
+    let all = $('.all');
+    if(value==='euler'){
+        all.show();
+        euler.show();
+        quat.hide();
+        quat.removeAttr('required');
+    } else if(value==='quaternion'){
+        quat.show();
+        quat.prop('required', true);
+        euler.hide();
+        all.show();
+    }
+    else {
+        quat.hide();
+        quat.removeAttr('required');
+        euler.hide();
+        all.hide();
+    }
 }
