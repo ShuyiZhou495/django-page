@@ -17,7 +17,7 @@
             </div>
                     <ul class="list-group list-group-flush bg-transparent text-info">
                         {% for msg in msgs %}
-                            <li class="list-group-item">{{ msg }}
+                            <li class="list-group-item">{{ msg|linebreaks }}
                         {% endfor %}
                     </ul>
             </div>

@@ -2,7 +2,7 @@
     <label for="id_name" class="col-sm-4">
         Name for this configuration
     </label>
-    <input type="text" name="name" id="id_name" class="col-sm-7 form-control">
+    <input type="text" name="name" id="id_name" class="col-sm-7 form-control" value="{{ config.name|default_if_none:"" }}">
 </div>
 <h4 class="row col">
    Frames
@@ -110,8 +110,8 @@
             name="ini_type" onchange="show_angles(this.value)"
             required>
         <option>Choose...</option>
-        <option value="euler"> Euler Angle (x y z) </option>
-        <option value="quaternion"> quaternion </option>
+        <option value="euler" {% if config.ini_type == 'euler' %}selected{% endif %}> Euler Angle (x y z) </option>
+        <option value="quaternion" {% if config.ini_type == 'quaternion' %}selected{% endif %}> quaternion </option>
     </select>
 </div>
 
@@ -252,7 +252,7 @@
 <hr>
 
     <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="id_verbose" name="verobose"
+        <input type="checkbox" class="form-check-input" id="id_verbose" name="verbose"
                 {% if config.verbose %} checked {% endif %}>
         <label class="form-check-label" for="id_verbose">
             output verbose gradient descent steps

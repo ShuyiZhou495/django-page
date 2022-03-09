@@ -97,19 +97,12 @@ class Config(models.Model):
 class ConfigForm(ModelForm):
     class Meta:
         model = Config
-        exclude = ['camera', 'lidar', 'selected', 'test']
-        labels = {
-            ""
-        }
+        fields = '__all__'
     def __init__(self, *args, **kwargs):
         super(ConfigForm, self).__init__(*args, **kwargs)
         for field in self.fields.keys():
             self.fields[field].widget.attrs.update({
                 'class':'form-control'
-            })
-        for field in ['select_frame_by_hand', 'verbose', 'rxyz', 'mi_use', 'edge_use', 'reproj_use']:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-check'
             })
 
 

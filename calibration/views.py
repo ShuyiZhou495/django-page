@@ -1,10 +1,21 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import View, generic
-from calibration.models import ConfigForm, CameraForm, LidarForm, Camera, Lidar, Config
+from calibration.models import ConfigForm, CameraForm, LidarForm, Camera as Cam, Lidar, Config
 import json
 import numpy as np
 import sys
+from django.urls import reverse
+
+from calibration.models import Config, Camera as Cam, Lidar
+
+class Running(View):
+    template = 'running.html'
+
+    def get(self, request, config_id):
+        return render(request, self.template, {
+            'config_id': config_id
+        })
 
 class Index(View):
     template = 'index.html'
@@ -28,14 +39,14 @@ class Add_config(View):
             return 'mac'
         if sys.platform == 'win32' or sys.platform=='cygwin':
             return 'win'
-        if sys.platform == 'linux'
+        if sys.platform == 'linux':
             return 'linux'
         return ''
 
     def get(self, request):
         return render(request, self.template,
                       {
-                          'camera': Camera(),
+                          'camera': Cam(),
                           'lidar': Lidar(),
                           'config': Config(),
                       })
@@ -45,7 +56,7 @@ class Add_config(View):
             data = request.FILES['file'].read()
             j = json.loads(data)
             models, msgs = self.load_from_json(j)
-            models['config'].name = str(request.FILES['file'])
+            models['config'].name = str(request.FILES['file']).replace('.json', '')
 
             return render(request, self.template,
                           {
@@ -55,16 +66,29 @@ class Add_config(View):
                               'config': models['config']
                           })
         else:
-            new_cam = CameraForm(request.POST)
-            new_lidar = LidarForm(request.POST)
-            if new_cam.is_valid():
-                new_cam.save()
-            if new_lidar.is_valid():
-                new_lidar.save()
-            return HttpResponse('saved')
+            data = request.POST.copy()
+            new_cam_form = CameraForm(data)
+            new_lidar_form = LidarForm(data)
+
+            if new_cam_form.is_valid() and new_lidar_form.is_valid():
+                new_cam = new_cam_form.save()
+                new_lidar = new_lidar_form.save()
+            else:
+                return HttpResponse('invalid camera or lidar')
+            data.update({'camera': new_cam.pk})
+            data.update({'lidar': new_lidar.pk})
+            print(data)
+            if 'test' not in data:
+                data.update({'test_amount': 0})
+            new_config_form = ConfigForm(data)
+            if new_config_form.is_valid():
+                new_config = new_config_form.save()
+            else:
+                return HttpResponse(new_config_form.as_table())
+            return HttpResponseRedirect(reverse('running', args=(2,)))
 
     def load_from_json(self, data):
-        cam = Camera()
+        cam = Cam()
         lidar = Lidar()
         config = Config()
         msgs = []
@@ -287,9 +311,44 @@ class Add_config(View):
                     config.delimiter = scan['delimiter']
                 except:
                     method_not_found['frames'].append('delimiters')
-
+            else:
+                method_not_found['frames'].append('scan files')
         else:
             method_not_found['frames'].append('image and scan file settings')
+        if 'camera' in data and 'initial_guess' in data['camera']:
+            initial_guess = data['camera']['initial_guess']
+            try:
+                config.ini_type = initial_guess['type']
+                try:
+                    config.R1 = initial_guess["R"][0]
+                    config.R2 = initial_guess["R"][1]
+                    config.R3 = initial_guess["R"][2]
+                    if config.ini_type == 'quaternion':
+                        try:
+                            config.R4 = initial_guess["R"][3]
+                        except:
+                            method_not_found['initial guess'].append('qw')
+                except:
+                    method_not_found['initial guess'].append(['rotation'])
+                if config.ini_type == 'euler':
+                    try:
+                        config.degree = initial_guess['degree']
+                    except:
+                        method_not_found['initial guess'].append('whether in degree')
+            except:
+                method_not_found['initial guess'].append('rotation type')
+            try:
+                config.t1 = initial_guess['t'][0]
+                config.t2 = initial_guess['t'][1]
+                config.t3 = initial_guess['t'][2]
+            except:
+                method_not_found['initial guess'].append('translation value')
 
-        msgs.append('Calibration Method Setting' + str(method_not_found))
+        method_msg = []
+        for k, v in method_not_found.items():
+            if v:
+                method_msg.append( f"{k}: {', '.join(v)}")
+        if method_msg:
+            msgs.append('Calibration Method Setting: \n' + "\n".join(method_msg))
         return {'cam': cam, 'lidar': lidar, 'config': config}, msgs
+
