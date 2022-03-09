@@ -10,3 +10,7 @@
 .line-small {
     line-height: 80%;
 }
+.limit-height {
+    max-height:300px;
+    overflow: scroll;
+}

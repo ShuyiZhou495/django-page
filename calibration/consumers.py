@@ -2,13 +2,13 @@ from channels.generic.websocket import  AsyncJsonWebsocketConsumer, WebsocketCon
 import json
 from calibration.funcs.main import run
 import threading
-import calibration.funcs.base.globals as variables
 from asyncio import sleep
 import ctypes
 
 class CalibrationConsumer(AsyncJsonWebsocketConsumer):
     x = threading.Thread()
-    async def receive(self, text_data=None, bytes_data=None, **kwargs):
+
+    async def kill(self):
         print('trying to kill the thread')
         await self.state('exit', 'start', 'exiting...')
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(self.x.ident),
@@ -21,11 +21,15 @@ class CalibrationConsumer(AsyncJsonWebsocketConsumer):
         await self.state('exit', 'finish')
         await self.close()
 
+    async def receive(self, text_data=None, bytes_data=None, **kwargs):
+        await self.kill()
+
+
 
     async def state(self, id, status, msg=''):
         await self.send(json.dumps({id: {status: msg}}))
         if status=='err':
-            await self.close()
+            await self.kill()
 
     async def cal_msg(self, event):
         await self.send_json({
@@ -34,13 +38,13 @@ class CalibrationConsumer(AsyncJsonWebsocketConsumer):
             }
         })
         if(event['status']) == 'err':
-            await self.close()
+            await self.kill()
 
     async def connect(self):
         await self.channel_layer.group_add("cal", self.channel_name)
         await self.accept()
         print(self.scope['url_route']['kwargs']['config_id'])
-        self.x = threading.Thread(target=run, args=(2, ))
+        self.x = threading.Thread(target=run, args=(self.scope['url_route']['kwargs']['config_id'], ))
         self.x.daemon = True
         self.x.start()
 

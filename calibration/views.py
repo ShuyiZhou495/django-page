@@ -85,7 +85,7 @@ class Add_config(View):
                 new_config = new_config_form.save()
             else:
                 return HttpResponse(new_config_form.as_table())
-            return HttpResponseRedirect(reverse('running', args=(2,)))
+            return HttpResponseRedirect(reverse('running', args=(new_config.pk,)))
 
     def load_from_json(self, data):
         cam = Cam()

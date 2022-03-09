@@ -6,7 +6,6 @@ from calibration.funcs.base.baseTransform import BaseTransform
 from calibration.funcs.base.util import state
 import random
 from calibration.models import Config, Camera as Cam, Lidar
-import calibration.funcs.base.globals as variable
 import json
 
 def run(number):

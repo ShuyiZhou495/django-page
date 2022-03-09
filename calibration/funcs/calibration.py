@@ -207,7 +207,7 @@ class Calibration:
             index += 1
             delF_ = delF.copy()
             if self.verbose:
-                state('calib', 'msg', self.lineToStr(f_curr, '   ^', '   ^', '   ^', '   ^', para))
+                state('calib', 'good')
                 print(termcolor.colored(self.lineToStr(f_curr, '   ^', '   ^', '   ^', '   ^', para), 'red'))
             if self.ex:
                 self.visualizeEX()
@@ -228,6 +228,7 @@ class Calibration:
         cost = r * r_co + (mi) * mi_co + (edge) * edge_co
 
         if self.verbose and p:
+            state('calib', 'ing', '<td>' + self.lineToStr(cost, mi, edge, r, 0, excalib).replace('|', '</td><td>') + '</td>')
             print(self.lineToStr(cost, mi, edge, r, 0, excalib))
             if self.use_mi and self.mi.show_plt:
                 plt.draw()
@@ -239,6 +240,7 @@ class Calibration:
         epi, repro, cost = self.reproj.calEgo(motion)
         if p and self.verbose:
             print(self.lineToStr(cost, 0, 0, repro, epi, motion))
+            state('calib', 'ing', '<td>' + self.lineToStr(cost, 0, 0, repro, epi, motion).replace('|', '</td><td>') + '</td>')
         return cost
 
     def calibOneLoop(self):
@@ -248,19 +250,22 @@ class Calibration:
 
             print("calibrate extrinsic parameter")
             state('calib', 'msg', "calibrate extrinsic parameter")
-            state('calib', 'msg', self.lineToStr('cost', 'mi', 'edge', 'repro', 'epi', ['R[x]', 'R[y]', 'R[z]', 'R[w]', 't[0]', 't[1]', 't[2]']))
+            state('calib', 'ing1', '<th>' + self.lineToStr('cost', 'mi', 'edge', 'repro', 'epi', ['R[x]', 'R[y]', 'R[z]', 'R[w]', 't[0]', 't[1]', 't[2]']).replace('|', '</th><th>') + '</th>')
             print(
                 self.lineToStr('cost', 'mi', 'edge', 'repro', 'epi', ['R[x]', 'R[y]', 'R[z]', 'R[w]', 't[0]', 't[1]', 't[2]']))
             best_res = self.gradient_descent(self.cam.excalib, self.calCost)
             self.cam.excalib = best_res
         else:
             print("calibrate ego motion")
+            state('calib', 'msg', "calibrate ego motion")
+            state('calib', 'ing1', '<th>' + self.lineToStr('cost', 'mi', 'edge', 'repro', 'epi', ['R[x]', 'R[y]', 'R[z]', 'R[w]', 't[1]', 't[2]']).replace('|', '</th><th>') + '</th>')
             print(
                 self.lineToStr('cost', 'mi', 'edge', 'repro', 'epi', ['R[x]', 'R[y]', 'R[z]', 'R[w]', 't[1]', 't[2]']))
             best_res = self.gradient_descent(self.reproj.frame1to2_motion, self.calEgoCost)
             self.reproj.frame1to2_motion = best_res
             cv2.destroyAllWindows()
         print(termcolor.colored(self.lineToStr(self.max_cost, '   -', '   -', '   -', '   -', best_res), 'blue'))
+        state('calib', 'res', '<td>' + self.lineToStr(self.max_cost, '   -', '   -', '   -', '   -', best_res).replace('|', '</td><td>') + '</td>')
 
 
     def calib(self):
@@ -284,8 +289,8 @@ class Calibration:
     def run(self):
         if self.test["amount"] == 0:
             self.calib()
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
         elif self.test["amount"] == -1:
             add = np.linspace(-self.test["t_range"], self.test["t_range"], 50)
             results = np.zeros((50, ))
@@ -315,4 +320,7 @@ class Calibration:
                 res[n] = self.cam.excalib
 
             print("average:", np.average(res, axis=0))
+            state('calib', 'msg', f'average: {np.average(res, axis=0)}')
             print("standard deviation", np.std(res, axis=0))
+            state('calib', 'msg', f'standard deviation: {np.std(res, axis=0)}')
+        state('calib', 'finish')

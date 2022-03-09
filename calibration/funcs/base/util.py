@@ -47,4 +47,3 @@ def state(id, status, msg=''):
             'status': status,
             'msg': msg}
     )
-    print(1)

@@ -1,6 +1,5 @@
 import numpy as np
 from calibration.funcs.base.oneFrameBase import OneFrameBase
-import calibration.funcs.base.globals as variables
 from calibration.funcs.base.frame import Frame
 import os
 import threading

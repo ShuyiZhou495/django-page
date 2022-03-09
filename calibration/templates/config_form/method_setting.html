@@ -65,7 +65,7 @@
     <div class="col form-group">
         <label for="id_skip_line"> How many lines to skip in scan txt</label>
         <input type="number" class="form-control" id="id_skip_line"
-               name="skip_line" value="{% if config.skip_line %}{{ config.skip_line}}{% endif %}">
+               name="skip_line"  min="0" step='1' value="{% if config.skip_line %}{{ config.skip_line}}{% endif %}">
         <small class="form-text text-muted">
             eg. if first line is title or count of lines, skip line is 1
         </small>
@@ -84,13 +84,13 @@
     </div>
     <input type="number" class="form-control random_select" id="id_start_frame" name="start_frame"
                value="{{ config.start_frame|default_if_none:'' }}" placeholder="start frame"
-               aria-label="start frame">
+               aria-label="start frame" step="1" min="0">
     <input type="number" class="form-control random_select" id="id_end_frame" name="end_frame"
                placeholder="end frame" aria-label="end frame"
-               value="{{ config.end_frame|default_if_none:'' }}">
+               value="{{ config.end_frame|default_if_none:'' }}" step="1" min="2">
     <input type="number" class="form-control random_select" id="id_use_frame" name="use_frame"
                placeholder="use frame" aria-label="use frame"
-               value="{{ config.use_frame|default_if_none:'' }}">
+               value="{{ config.use_frame|default_if_none:'' }}" step="1" min="2">
     <input type="text" class="form-control manual_select" id="id_selected" aria-label="selected frames"
            name="selected" value="{{ config.selected|default_if_none:'' }}"
     placeholder="separate by comma, eg. 2, 4, 5, 62, 100">
@@ -128,10 +128,10 @@
     <div class="input-group-prepend">
         <span class="input-group-text">rotation</span>
     </div>
-    <input type="number" class="form-control all" placeholder="x" aria-label="R1" name="R1" value="{{ config.R1 }}" required>
-    <input type="number" class="form-control all" placeholder="y" aria-label="R2" name="R2" value="{{ config.R2 }}" required>
-    <input type="number" class="form-control all" placeholder="z" aria-label="R3" name="R3" value="{{ config.R3 }}" required>
-    <input type="number" class="form-control quat" placeholder="w" aria-label="R4" name="R4" value="{{ config.R4 }}">
+    <input type="number" class="form-control all" step="any" placeholder="x" aria-label="R1" name="R1" value="{{ config.R1 }}" required>
+    <input type="number" class="form-control all" step="any" placeholder="y" aria-label="R2" name="R2" value="{{ config.R2 }}" required>
+    <input type="number" class="form-control all" step="any" placeholder="z" aria-label="R3" name="R3" value="{{ config.R3 }}" required>
+    <input type="number" class="form-control quat" step="any" placeholder="w" aria-label="R4" name="R4" value="{{ config.R4 }}">
 </div>
 </div>
 <div class="row">
@@ -139,9 +139,9 @@
         <div class="input-group-prepend">
             <span class="input-group-text">traslation</span>
         </div>
-        <input type="number" class="form-control" placeholder="x" aria-label="t1" name="t1" value="{{ config.t1 }}" required>
-        <input type="number" class="form-control" placeholder="y" aria-label="t2" name="t2" value="{{ config.t2 }}" required>
-        <input type="number" class="form-control" placeholder="z" aria-label="t3" name="t3" value="{{ config.t3 }}" required>
+        <input type="number" class="form-control" step="any" placeholder="x" aria-label="t1" name="t1" value="{{ config.t1 }}" required>
+        <input type="number" class="form-control" step="any" placeholder="y" aria-label="t2" name="t2" value="{{ config.t2 }}" required>
+        <input type="number" class="form-control" step="any" placeholder="z" aria-label="t3" name="t3" value="{{ config.t3 }}" required>
     </div>
 </div>
 <h4 class="row col mt-3">
@@ -223,7 +223,7 @@
                 <div class="input-group-prepend">
                     <label for="id_discontinuity" class="input-group-text bg-white">discontinuity Threshold</label>
                 </div>
-                <input type="number" id="id_discontinuity" class="form-control"
+                <input type="number" step="any" id="id_discontinuity" class="form-control"
                        name="discontinuity" value="{{ config.discontinuity|default_if_none:''}}">
             </div>
             <small class="col form-text text-muted  mb-2">
@@ -290,7 +290,7 @@
             <div class="input-group-prepend">
                 <label for="id_test_amount" class="input-group-text bg-white">Amount of tests</label>
             </div>
-            <input type="number" id="id_test_amount" class="form-control"
+            <input type="number" step="1" min="-1" id="id_test_amount" class="form-control"
                    name="test_amount"
                    value="{% if config.test_amount > 0 %}{{ config.test_amount }}{% endif %}">
         </div>
@@ -299,14 +299,14 @@
             <div class="input-group-prepend">
                 <label for="id_R_range" class="input-group-text bg-white">Deviation of rotation from initial guess</label>
             </div>
-            <input type="number" id="id_R_range" class="form-control"
+            <input type="number" step="any" id="id_R_range" class="form-control"
                    name="R_range" value="{{ config.R_range }}">
         </div>
         <div class="input-group col-11 mb-2">
             <div class="input-group-prepend">
                 <label for="id_t_range" class="input-group-text bg-white">Deviation of translation from initial guess</label>
             </div>
-            <input type="number" id="id_t_range" class="form-control"
+            <input type="number" id="id_t_range" class="form-control" step="any"
                    name="t_range" value="{{ config.t_range }}">
         </div>
     </div>
