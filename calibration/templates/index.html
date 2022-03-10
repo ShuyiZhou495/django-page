@@ -3,8 +3,53 @@
     <div class="container">
         <div class="d-flex justify-content-center">
             <form action='{% url 'add_config' %}' method='GET'>
-            <button class="btn btn-outline-secondary " type="submit">add configuration</button>
+            <button class="btn btn-outline-secondary mb-4" type="submit">add configuration</button>
             </form>
         </div>
+    <div class="row">
+        {% for config in configs %}
+        <div class="col-4">
+            <div class="card">
+
+                <div class="card-header">
+                    {{ config.name }}
+                </div>
+                    <div class="card-body" style="font-size: small;">
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <tr><th> Camera: </th> <td>{{ config.camera.cname }}</td></tr>
+                            <tr><th> Lidar: </th> <td>{{ config.lidar.lname }}</td></tr>
+                            <tr>
+                                <th> use MI: </th>
+                                <td>
+                                    {% if config.mi_use %}<i class="fas fa-check"></i>
+                                    {% else %}<i class="fas fa-times"></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th> use Edge: </th>
+                                <td>
+                                    {% if config.edge_use %}<i class="fas fa-check"></i>
+                                    {% else %}<i class="fas fa-times"></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a class="btn btn-outline-primary" type="button"
+                                       href={% url 'running' config.id %}>use this</a> </td>
+                                <td><a class="btn btn-outline-secondary" type="button"
+                                   href={% url 'edit_config' config.id %}>modify</a> </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     </div>
 {% endblock %}

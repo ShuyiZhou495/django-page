@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import View, generic
 from calibration.models import ConfigForm, CameraForm, LidarForm, Camera as Cam, Lidar, Config
@@ -20,7 +20,8 @@ class Running(View):
 class Index(View):
     template = 'index.html'
     def get(self, request):
-        return render(request, self.template)
+        return render(request, self.template, {'configs': Config.objects.all()})
+
 
 class Add_config(View):
     template = 'add_config.html'
@@ -43,15 +44,23 @@ class Add_config(View):
             return 'linux'
         return ''
 
-    def get(self, request):
+    def get(self, request, config_id=None):
+        if(config_id):
+            config = get_object_or_404(Config, pk=config_id)
+            cam = config.camera
+            lidar = config.lidar
+        else:
+            config = Config()
+            cam = Cam()
+            lidar = Lidar()
         return render(request, self.template,
                       {
-                          'camera': Cam(),
-                          'lidar': Lidar(),
-                          'config': Config(),
+                          'camera': cam,
+                          'lidar': lidar,
+                          'config': config,
                       })
 
-    def post(self, request):
+    def post(self, request, config_id=None):
         if 'file' in request.FILES:
             data = request.FILES['file'].read()
             j = json.loads(data)
@@ -66,10 +75,18 @@ class Add_config(View):
                               'config': models['config']
                           })
         else:
-            data = request.POST.copy()
-            new_cam_form = CameraForm(data)
-            new_lidar_form = LidarForm(data)
 
+            data = request.POST.copy()
+
+            if config_id:
+                config = get_object_or_404(Config, pk=config_id)
+                cam = get_object_or_404(Cam, pk=config.camera_id)
+                lid = get_object_or_404(Lidar, pk=config.lidar_id)
+                new_cam_form = CameraForm(data, instance=cam)
+                new_lidar_form = LidarForm(data, instance=lid)
+            else:
+                new_cam_form = CameraForm(data)
+                new_lidar_form = LidarForm(data)
             if new_cam_form.is_valid() and new_lidar_form.is_valid():
                 new_cam = new_cam_form.save()
                 new_lidar = new_lidar_form.save()
@@ -77,10 +94,12 @@ class Add_config(View):
                 return HttpResponse('invalid camera or lidar')
             data.update({'camera': new_cam.pk})
             data.update({'lidar': new_lidar.pk})
-            print(data)
             if 'test' not in data:
                 data.update({'test_amount': 0})
-            new_config_form = ConfigForm(data)
+            if config_id:
+                new_config_form = ConfigForm(data, instance=config)
+            else:
+                new_config_form = ConfigForm(data)
             if new_config_form.is_valid():
                 new_config = new_config_form.save()
             else:

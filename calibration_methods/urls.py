@@ -22,6 +22,7 @@ from . import settings
 urlpatterns = [
     path('', views.Index.as_view(), name='index'),
     path('add_config/', views.Add_config.as_view(), name='add_config'),
+    path('edit_config/<int:config_id>', views.Add_config.as_view(), name='edit_config'),
     path('running/<int:config_id>', views.Running.as_view(), name='running'),
     path('admin/', admin.site.urls),
 ]
