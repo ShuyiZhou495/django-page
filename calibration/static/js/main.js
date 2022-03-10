@@ -6,13 +6,13 @@ function add_row(text, id){
     return `<tr id="id_${id}">
                 <th scope="row"><span id="id_${id}_load" class="loader fas fa-spinner"></span></th>
                 <td>${text}</td>
-                <td ><div class="container limit-height"><small id="id_${id}_msg"></small></div></td>
+                <td ><div class="container limit-height" id="id_${id}_box"><small id="id_${id}_msg"></small></div></td>
             </tr>`
 }
 
 function add_msg(msg, err=false){
     let color = err? 'text-danger': 'text-muted';
-    return `<p class="font-weight-light line-small ${color}">${msg}</p>`
+    return `<p class="font-weight-light ${color}">${msg}</p>`
 }
 
 socket.onmessage = function (e) {
@@ -22,6 +22,8 @@ socket.onmessage = function (e) {
         let cate = Object.keys(data[id])[0];
         if (cate === "msg"){
             $('#id_'+ id + '_msg').append(add_msg(data[id]['msg'], false));
+            let container = $('#id_'+id+'_box')[0];
+            container.scrollTop = container.scrollHeight-container.offsetHeight;
         }else if(cate === 'err'){
             $('#id_'+ id + '_msg').append(add_msg(data[id]['err'], true));
             let load = $('#id_'+ id + '_load');
@@ -36,19 +38,21 @@ socket.onmessage = function (e) {
         }else if(cate === 'start') {
             $("#id_table").append(add_row(data[id]['start'], id));
         }else if(cate === 'ing1'){
-            $('#id_calib_msg').append(
-                `<table class="table" id="id_calib_table"><tr class="text-muted"><th></th>${data[id][cate]}</tr></table>`)
+            $('#id_calib_opt').append(
+                `<table class="table" id="id_calib_table" ><tr class="text-muted"><th></th>${data[id][cate]}</tr></table>`)
         }else if(cate === 'ing') {
-            $("#id_calib_table").append(`<tr class="text-muted"><th></th>${data[id][cate]}</tr>`)
+            $("#id_calib_table").append(`<tr class="text-muted"><td></td>${data[id][cate]}</tr>`)
         } else if(cate === 'good') {
-            $($('#id_calib_table')[0].lastChild.lastChild).removeClass("text-muted").addClass('text-danger')
+            $($('#id_calib_table')[0].lastChild.lastChild).removeClass("text-muted").addClass('text-info')
+            let container = $('#id_calib_opt')[0];
+            container.scrollTop = container.scrollHeight-container.offsetHeight - 16.5;
         } else if(cate === 'res') {
-            $("#id_calib_table").append(`<tr class="text-info"><th>result</th>${data[id][cate]}</tr>`)
-        } else if(cate === 'img'){
-            $('#id_img');
+            $("#id_calib_table").append(`<tr class="text-danger"><td>result</td>${data[id][cate]}</tr>`)
+            let container = $('#id_calib_opt')[0];
+            container.scrollTop = container.scrollHeight-container.offsetHeight - 16.5;
         }
     }catch (error) {
-        $('#id_img')[0].innerHTML = `<img class='rounded mx-auto d-block' src=${ e.data } />`
+        $('#id_img')[0].innerHTML = `<img class='img-fluid img-thumbnail rounded mx-auto d-block' src=${ e.data } />`
     }
 
 }

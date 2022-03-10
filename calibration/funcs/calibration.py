@@ -216,7 +216,7 @@ class Calibration:
         return best_para
 
     def calCost(self, excalib, p=True):
-        edge, mi, r = 0, 0.1, 0
+        edge, mi, r = 0, 0, 0
         edge_co, mi_co, r_co = 1, 1, 1/200
         if self.use_edge:
             edge = self.edge.calibEx(excalib)

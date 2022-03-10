@@ -6,19 +6,40 @@
 {% block body %}
 
     <div class="container-fluid">
-    <button class="btn btn-outline-danger" type="button" onclick="stop()">stop</button>
-        <div class="row" id="id_img">
+    <div class="row">
+        <div class="col-12">
+            <button class="btn btn-outline-danger mb-2" type="button" onclick="stop()">stop</button>
         </div>
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col" id="title" class="{{ config_id }}">status</th>
-            </tr>
-            </thead>
-            <tbody id="id_table" >
+    </div>
 
-            </tbody>
-        </table>
+        <div class="row limit-height-thin">
+            <div class="col-12">
+            <div class="container" id="id_calib_title"></div>
+            </div>
+        </div>
+        <div class="row limit-height-thin" >
+            <div class="col-12">
+            <div class="container limit-height-thin" id="id_calib_opt"></div>
+            </div>
+        </div>
+        <div class="row mb-2 mt-2"  id="id_img">
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col" id="title" class="{{ config_id }}">status</th>
+                    </tr>
+                    </thead>
+                    <tbody id="id_table" >
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
 
     </div>
 

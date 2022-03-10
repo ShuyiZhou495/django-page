@@ -11,6 +11,17 @@
     line-height: 80%;
 }
 .limit-height {
-    max-height:300px;
+    max-height:200px;
     overflow: scroll;
+}
+.limit-height-thin {
+    max-height:88px;
+    overflow: scroll;
+    font-size: small;
+}
+
+table tr:nth-child(1){
+    position:sticky;
+    top:0;
+    background:white;
 }

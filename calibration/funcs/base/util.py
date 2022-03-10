@@ -33,7 +33,7 @@ file_name = 1
 
 def draw_circles(img, centers, color, radius, title, wait):
     project = img.copy()
-    img_size = 500
+    img_size = 600
     for i in range(centers.shape[0]):
         rounded = np.round(centers[i, 0:2]).astype(int)
         if rounded[0] >= img.shape[1] or rounded[1] >= img.shape[0] or rounded[0] < 0 or rounded[1] < 0:
@@ -45,7 +45,7 @@ def draw_circles(img, centers, color, radius, title, wait):
 
 def draw_circles_one_image(img, centers, color, radius, title, wait):
     project = img.copy()
-    img_size = 500
+    img_size = 600
     for cent, col in zip(centers, color):
         for i in range(cent.shape[0]):
             rounded = np.round(cent[i, 0: 2]).astype(int)
