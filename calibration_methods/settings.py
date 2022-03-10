@@ -126,16 +126,20 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_ROOT = 'calibration/static/'
-STATIC_URL = 'calibration/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'calibration', 'static')
+STATIC_URL = '/static/'
 
 # this is directory paths where you have to put your project level static files
 # you can put multiple folders here
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR),
+    os.path.join(BASE_DIR, 'calibration'),
 )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'calibration', 'media')

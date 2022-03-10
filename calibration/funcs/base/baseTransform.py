@@ -25,7 +25,6 @@ class BaseTransform():
             R.from_quat(excalib[0:4]).as_matrix(),
             p[:, 0:3]
         ) + excalib[4:7].reshape((3, 1))
-
         return p[p[:, 2, 0] > 0] if self.cam.type != "Omnidirectional" else p
 
     def toImage(self, p3d, excalib) -> np.ndarray:

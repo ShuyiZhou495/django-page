@@ -134,8 +134,8 @@ class Calibration:
 
     def gradient_descent(self, parameter, func):
         length = 7
-        gamma_t_u, gamma_t_l = 0.02, 0.001
-        gamma_r_u, gamma_r_l = 0.02, 0.0005
+        gamma_t_u, gamma_t_l = 0.05, 0.001
+        gamma_r_u, gamma_r_l = 0.05, 0.0005
         delta = np.zeros((length,))
         delta[0: (length + 1)//2] = 0.01
         delta[(length + 1)//2: length] = 0.01

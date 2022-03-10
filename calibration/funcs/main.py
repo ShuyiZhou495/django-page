@@ -55,6 +55,7 @@ def run(number):
         myCalibration.run()
     finally:
         print('exit')
+        state('exit', 'start', 'exit')
 
 
 async def run_async(number):

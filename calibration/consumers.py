@@ -4,6 +4,8 @@ from calibration.funcs.main import run
 import threading
 from asyncio import sleep
 import ctypes
+import os, shutil
+from calibration_methods.settings import MEDIA_ROOT
 
 class CalibrationConsumer(AsyncJsonWebsocketConsumer):
     x = threading.Thread()
@@ -18,6 +20,15 @@ class CalibrationConsumer(AsyncJsonWebsocketConsumer):
             print('Exception raise failure')
         while self.x.is_alive():
             pass
+
+        for filename in os.listdir(MEDIA_ROOT):
+            file_path = os.path.join(MEDIA_ROOT, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+
         await self.state('exit', 'finish')
         await self.close()
 
@@ -32,12 +43,19 @@ class CalibrationConsumer(AsyncJsonWebsocketConsumer):
             await self.kill()
 
     async def cal_msg(self, event):
-        await self.send_json({
-            event['id']: {
-                event['status']: event['msg']
-            }
-        })
-        if(event['status']) == 'err':
+        if event['id'] == 'exit':
+            await self.kill()
+            return
+        if event['status'] == 'img':
+            print(type(event['msg']))
+            await self.send(text_data=event['msg'])
+        else:
+            await self.send_json({
+                event['id']: {
+                    event['status']: event['msg']
+                }
+            })
+        if event['status'] == 'err':
             await self.kill()
 
     async def connect(self):

@@ -9,7 +9,7 @@ class Camera:
     excalib = None
 
     def __init__(self, param):
-        self.height, self.width = param.height, param.height
+        self.height, self.width = param.height, param.width
         if param.mask:
             self.mask = cv2.imread(param.mask, cv2.IMREAD_GRAYSCALE)
         else:
@@ -140,8 +140,12 @@ class PerspectiveCam(Camera):
     type = "Perspective"
     def __init__(self, param):
         super().__init__(param)
-        self.k = np.array(param["k"])
-        self.dist = np.array(param["dist"])
+        self.k = np.array([
+            [param.cfx, 0, param.cx],
+            [0, param.cfy, param.cy],
+            [0, 0, 1]
+        ])
+        self.dist = np.array([[param.ck1, param.ck2, param.cp1, param.cp2, param.ck3]])
 
     def inner_trans(self, point_3d: np.ndarray):
         p2s, _ = cv2.projectPoints(point_3d.reshape((-1, 1, 3)), np.eye(3), np.zeros((3,1)), self.k, self.dist)

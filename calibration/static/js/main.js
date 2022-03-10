@@ -16,9 +16,10 @@ function add_msg(msg, err=false){
 }
 
 socket.onmessage = function (e) {
-    let data = JSON.parse(e.data);
-    let id = Object.keys(data)[0];
-    let cate = Object.keys(data[id])[0];
+    try {
+        let data = JSON.parse(e.data);
+        let id = Object.keys(data)[0];
+        let cate = Object.keys(data[id])[0];
         if (cate === "msg"){
             $('#id_'+ id + '_msg').append(add_msg(data[id]['msg'], false));
         }else if(cate === 'err'){
@@ -43,8 +44,12 @@ socket.onmessage = function (e) {
             $($('#id_calib_table')[0].lastChild.lastChild).removeClass("text-muted").addClass('text-danger')
         } else if(cate === 'res') {
             $("#id_calib_table").append(`<tr class="text-info"><th>result</th>${data[id][cate]}</tr>`)
+        } else if(cate === 'img'){
+            $('#id_img');
+        }
+    }catch (error) {
+        $('#id_img')[0].innerHTML = `<img class='rounded mx-auto d-block' src=${ e.data } />`
     }
-
 
 }
 

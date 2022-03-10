@@ -152,6 +152,7 @@ class FrameTXT(Frame):
             return
         if self.frame_info.rxyz:
             # change the formate to [x, y, z, reflectivity]
+            print('rxyz')
             r = self.pointcloud[:, 0].copy()
             self.pointcloud[:, 0:3] = self.pointcloud[:, 1:4]
             self.pointcloud[:, 3] = r
