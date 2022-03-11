@@ -1,15 +1,17 @@
 import numpy as np
 from calibration.funcs.base.oneFrameBase import OneFrameBase
 from calibration.funcs.base.frame import Frame
+from calibration.funcs.base.util import state
+
 import os
 import threading
 import time
 import datetime
-
 import cv2.cv2 as cv2
 
 class Edge(OneFrameBase):
     type = "Edge"
+    pause_ = False
     def __init__(self, config):
         super().__init__(config)
         self.__edge_path__ = config.edge_path
@@ -61,16 +63,20 @@ class Edge(OneFrameBase):
                 gey += frame.img.shape[1] - 1 - ey
                 ey = frame.img.shape[1] - 1
             frame.D[i, j] = self.__alpha__ * frame.edge[i, j] + (1 - self.__alpha__) * np.max(frame.edge[sx:ex, sy:ey] * self.__gamma_pow__[gsx:gex, gsy:gey])
+        state('frame', 'edge-inv', f'{int(i / frame.img.shape[0] * 100)}')
         print(f"\r{i} / {frame.img.shape[0]}; time cost: {str(datetime.timedelta(seconds=int(time.time() - self.__stime__)))}", end="")
 
     def __cal_img_edge_inv__(self, frame: Frame):
         # ---inverse distance transform---
         path_name = self.__edge_path__ + f"edge_inv_{frame.num:04}" + ".npy"
         if os.path.exists(path_name):
+            state('frame', 'msg', f"loading edge_inv for frame {frame.num}")
             print(f"loading edge_inv for frame {frame.num}")
-            D = np.load(path_name)
+            D = np.load(path_name, allow_pickle=True)
             if D is None or D.shape[0] < frame.img.shape[0]:
                 si = D.shape[0] if D is not None else 0
+                state('frame', 'msg', f"file is not complete, calculating from the {si}th line")
+                state('frame', 'edge-inv-start', f'{int(si/frame.img.shape[0] * 100)}')
                 print(f"file is not complete, calculating from the {si}th line")
                 frame.D = np.zeros(frame.edge.shape)
                 frame.D[:si] = D
@@ -80,6 +86,8 @@ class Edge(OneFrameBase):
         else:
             si = 0
             frame.D = np.zeros(frame.edge.shape)
+            state('frame', 'msg', f"calculating edge_inv for frame {frame.num}")
+            state('frame', 'edge-inv-start', f"0")
             print(f"calculating edge_inv for frame {frame.num}")
         # -- initialize variables
         self.__alpha__ = 1/3
@@ -98,16 +106,18 @@ class Edge(OneFrameBase):
         self.__stime__ = time.time()
         if thread_num == 1:
             for i in range(si, frame.img.shape[0]):
-                try:
+                if not self.pause_:
+                    state('frame', 'edge-inv', f'{int(i / frame.img.shape[0] * 100) }')
                     print(f"\r{i} / {frame.img.shape[0]}; time cost: {str(datetime.timedelta(seconds=int(time.time() - self.__stime__)))}", end="")
                     self.__cal_a_pixel__(i, frame)
-                except Exception as e:
-                    print('\n' + str(e))
+                else:
+                    state('frame', 'err', f'save file till line {i-1}')
+                    print('\n' + f'save file till line {i-1}')
                     np.save(path_name, frame.D[:i-1])
                     return
         else:
             for i in range(si, frame.img.shape[0], thread_num):
-                try:
+                if not self.pause_:
                     threads = []
                     for c in range(thread_num):
                         if(c + i >= frame.img.shape[0]):
@@ -116,13 +126,10 @@ class Edge(OneFrameBase):
                         threads[-1].start()
                     for c in range(len(threads)):
                         threads[c].join()
-                except KeyboardInterrupt:
-                    print('\n' + "KeyboardInterrupt")
-                    np.save(path_name, frame.D[:i-1])
-                    exit(-1)
-                except Exception as e:
-                    print('\n' + str(e))
-                    np.save(path_name, frame.D[:i-1])
+                else:
+                    state('frame', 'err', f'save file till line {i-thread_num}')
+                    print('\n' + f'save file till line {i-thread_num}')
+                    np.save(path_name, frame.D[:i-thread_num])
                     return
             print()
         np.save(path_name, frame.D)
@@ -132,14 +139,19 @@ class Edge(OneFrameBase):
         path_name = self.__edge_path__ + f"edge_{frame.num:04}" + ".png"
         if os.path.exists(path_name):
             print(f"loading edge for frame {frame.num}")
+            state('frame', 'msg', f"loading edge for frame {frame.num}")
             frame.edge = cv2.imread(path_name, cv2.IMREAD_GRAYSCALE)
         else:
             print(f"calculating edge for frame {frame.num}")
+            state('frame', 'msg', f"calculating edge for frame {frame.num}")
+
             img = frame.gray.astype(int)
+            state('frame', 'edge-start', '0')
             frame.edge = np.zeros(img.shape)
             # -- each pixel is set to the largest absolute value of the difference between it and any of its 8 neighbors
             for i in range(1, img.shape[0] - 2):
                 print(f"\r\t{i} / {img.shape[0]}", end="")
+                state('frame', 'edge', f'{int(i/img.shape[0] * 100)}')
                 for j in range(1, img.shape[1] - 2):
                     p = img[i, j]
                     frame.edge[i, j] = max(

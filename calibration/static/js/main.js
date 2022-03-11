@@ -50,13 +50,36 @@ socket.onmessage = function (e) {
             $("#id_calib_table").append(`<tr class="text-danger"><td>result</td>${data[id][cate]}</tr>`)
             let container = $('#id_calib_opt')[0];
             container.scrollTop = container.scrollHeight-container.offsetHeight - 16.5;
+        } else if(cate === 'edge-start' || cate === 'edge-inv-start') {
+            $('#id_'+ id + '_msg').append(`
+<div class="row">
+<div class="col-10">
+<div class="progress">
+<div class="progress-bar progress-bar-striped bg-info"
+id=${"id_" + cate} role="progressbar"  style="width: ${data[id][cate]}%" 
+aria-valuenow="${data[id][cate]}" aria-valuemin="0" aria-valuemax="100"></div></div>
+</div>` + ( cate=== 'edge-inv-start'?
+`<div class="col-2">
+<a class="badge badge-danger" href="#" type="button" onclick="pause_edge()">
+<span class="fas fa-pause"></span></a>        
+</div>          </div>                       
+`:''))
+        } else if (cate === 'edge' || cate === 'edge-inv') {
+            let f = $("#id_" + cate + '-start')[0];
+            f.setAttribute( 'style', "width: "+data[id][cate]+"%");
+            f.setAttribute( 'aria-valuenow', data[id][cate]);
         }
     }catch (error) {
+        console.log(error);
         $('#id_img')[0].innerHTML = `<img class='img-fluid img-thumbnail rounded mx-auto d-block' src=${ e.data } />`
     }
 
 }
 
 function stop(){
-    socket.send('stop pressed');
+    socket.send('kill');
+}
+
+function pause_edge(){
+    socket.send('edge_pause');
 }

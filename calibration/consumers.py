@@ -2,7 +2,7 @@ from channels.generic.websocket import  AsyncJsonWebsocketConsumer, WebsocketCon
 import json
 from calibration.funcs.main import run
 import threading
-from asyncio import sleep
+import  calibration.funcs.methods.edge as edge
 import ctypes
 import os, shutil
 from calibration_methods.settings import MEDIA_ROOT
@@ -33,9 +33,11 @@ class CalibrationConsumer(AsyncJsonWebsocketConsumer):
         await self.close()
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
-        await self.kill()
-
-
+        if text_data == 'kill':
+            await self.kill()
+        elif text_data == 'edge_pause':
+            edge.Edge.pause_ = True
+            await self.state('frame', 'msg', 'waiting to pause')
 
     async def state(self, id, status, msg=''):
         await self.send(json.dumps({id: {status: msg}}))
@@ -64,6 +66,7 @@ class CalibrationConsumer(AsyncJsonWebsocketConsumer):
         print(self.scope['url_route']['kwargs']['config_id'])
         self.x = threading.Thread(target=run, args=(self.scope['url_route']['kwargs']['config_id'], ))
         self.x.daemon = True
+        edge.Edge.pause_ = False
         self.x.start()
 
 

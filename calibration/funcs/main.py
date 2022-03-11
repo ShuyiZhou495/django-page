@@ -9,7 +9,7 @@ from calibration.models import Config, Camera as Cam, Lidar
 import json
 
 def run(number):
-    try:
+    # try:
         ### --- camera setting ----
         config = Config.objects.get(pk=number)
         state('cam', 'start', 'Loading camera parameters')
@@ -53,9 +53,11 @@ def run(number):
         myCalibration = Calibration(myCam, frames, config)
         state('calib', 'start', 'Calibrating')
         myCalibration.run()
-    finally:
-        print('exit')
-        state('exit', 'start', 'exit')
+    # except Exception as e:
+    #     state('calib', 'err', str(e))
+    #     print(e)
+    #     print('exit')
+    #     state('exit', 'start', 'exit')
 
 
 async def run_async(number):
